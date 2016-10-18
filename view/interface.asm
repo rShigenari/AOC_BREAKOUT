@@ -2,6 +2,10 @@
 
 li $t6, 280                         # Posicao inicial da barra em y
 li $t7, 50                          # Posicao inicial da barra em x
+
+li $k0, 70                          # Posicao inicial da bolinha em x
+li $k1, 266                         # Posicao inicial da bolinha em y
+
 j Inicializa                        # Inicia os desenhos
 
 ######Desenhando varios retangulos#####
@@ -76,10 +80,10 @@ loop:
  
 loop2:
 
-   move $s0, $s4                    # Reseta x1 para o inicio
+   move $s0, $s4                     # Reseta x1 para o inicio
  
    blt  $s1, $t1, DrawPixel          # Enquanto y1 nao atingiu o limite (t1) pinte o pixel (s0, s1)
-   j    loop3                        # Quando terminar o retangulo va desenhar a barra
+   j    loop3                        # Quando terminar o retangulo va desenhar o proxima retangulo
 
  
 DrawPixel:
