@@ -32,7 +32,7 @@ loop3:
     
 loop4:
 
-    addi $s2, $s2, 15                # Adiciona no inicio do proximo retangulo (em y)
+    addi $s2, $s2, 14                # Adiciona no inicio do proximo retangulo (em y)
     move $s4, $s3                    # Reseta o x inicial do retangulo para o x0
     
     bge  $s2, $t4, MudaCorVerde      # Muda a cor dos retangulos para verde
