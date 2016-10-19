@@ -194,13 +194,13 @@ Bola2:
     addi $t2, $s0, 14                # Posicao final de x
     addi $t1, $s1, 12                # Posicao final de y
     
-    j    loop15                       # Comece a desenhar
+    j    loop15                      # Comece a desenhar
     
  
 loop15:
 
    blt $s0, $t2, DrawPixel7          # Enquanto $s0 nao atingiu o limite (em x) pinta os pixels em (s0, s3)
-   j   loop16                         # Finaliza o programa
+   j   loop16                        # Finaliza o programa
    
    
 loop16:
@@ -306,13 +306,13 @@ DrawPixel6:
     addu  $t0, $t3, $t0              # Adiciona xy ao primeiro pixel ( t3 )
     sw    $a2, ($t0)                 # Coloca a cor branca ($a2) em $t0
 
-    j loop7                          # Volta para o loop de desenho
+    j loop12                         # Volta para o loop de desenho
     
     
 #############Detecta a entrada###########
 DetectaEntrada:
     
-    beq $a3, ' ', MoverBola          # Enquanto $a3 for igual a 'espaço' mova a bolinha
+    beq $a3, ' ', PintaPretoBola     # Enquanto $a3 for igual a 'espaço' mova a bolinha
     beq $a3, 'a', PintaPreto         # Se for 'a' eh para mover a barra
     beq $a3, 'd', PintaPreto         # Se for 'd' tambem move a barra
     j   loop9                        # Se nao for nem 'a', 'd' ou 'espaço' va para o loop
@@ -326,7 +326,9 @@ DetectaMovimento:
     
 ############MOve a bolinha#####################
 MoverBola:
-    j loop9
+    subi $k1, $k1, 1                 # Move a bolinha em 1 em y
+    
+    j Bola2                          # Move pra funcao de pintar a bolinha de novo na tela
     
 #############Move a barra Para a Esquerda#######
 MoverEsquerda:
