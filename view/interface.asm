@@ -6,6 +6,8 @@ li $t7, 50                          # Posicao inicial da barra em x
 li $k0, 70                          # Posicao inicial da bolinha em x
 li $k1, 266                         # Posicao inicial da bolinha em y
 
+li $v1, 0                           # Detecta se o jogo já começou
+
 j Inicializa                        # Inicia os desenhos
 
 ######Desenhando varios retangulos#####
@@ -312,7 +314,7 @@ DrawPixel6:
 #############Detecta a entrada###########
 DetectaEntrada:
     
-    beq $a3, ' ', PintaPretoBola     # Enquanto $a3 for igual a 'espaço' mova a bolinha
+    beq $a3, ' ', DetectaInicio      # Enquanto $a3 for igual a 'espaço' mova a bolinha
     beq $a3, 'a', PintaPreto         # Se for 'a' eh para mover a barra
     beq $a3, 'd', PintaPreto         # Se for 'd' tambem move a barra
     j   loop9                        # Se nao for nem 'a', 'd' ou 'espaço' va para o loop
@@ -324,9 +326,9 @@ DetectaMovimento:
     beq $a3, 'd', MoverDireita       # Move a barra para a direita
     j loop9
     
-############MOve a bolinha#####################
+############Move a bolinha#####################
 MoverBola:
-    subi $k1, $k1, 1                 # Move a bolinha em 1 em y
+    subi $k1, $k1, 5                 # Move a bolinha em 1 em y
     
     j Bola2                          # Move pra funcao de pintar a bolinha de novo na tela
     
@@ -345,6 +347,15 @@ MoverDireita:
     
     j Barra
 
+
+#############Verifica se o jogo ja comecou##########
+DetectaInicio:
+    beq $v1, 0, SetaInicio          # Se o jogo ainda nao começou entao va setar $v1 para 1 e iniciar o jogo
+    j loop9
+    
+SetaInicio:
+    li $v1, 1                       # Seta a variavel de controle para joga iniciado
+    j PintaPretoBola                # Va pintar a bolinha
 
 #############Loop do jogo##########
 loop9:
