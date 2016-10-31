@@ -1,0 +1,13 @@
+Bom, fiz esse readme para vocês entenderem o que eu fiz no projeto, quais
+registradores já estão sendo usados e não podem ser sobrescritos.
+
+Os regitradores que não podem ser sobrescritos são $t6, $t7, $k0, $k1, $v0.
+
+Os registradores que podem ser rescritos depois que iniciar o jogo são: $s2,
+$s3, $s4, $4, $t5, $t8, $t9 (acho que só rs).
+
+Os registradores que são sempre setados quando chamado uma função qualquer de
+desenho são: $s0, $s1, $t0, $t1, $t2, $a2.
+
+Obs.: o registrador $v0 é usado para pegar elementos da entrada sempre, então
+não use ele!!!
