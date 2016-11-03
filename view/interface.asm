@@ -2,12 +2,6 @@
 
 Inicializa:
     jal InicializaRetangulos        # Desenha os Retangulos
-    li $t6, 280                     # Posicao inicial da barra em y
-    li $t7, 50                      # Posicao inicial da barra em x
-
-    li $k0, 70                      # Posicao inicial da bolinha em x
-    li $k1, 266                     # Posicao inicial da bolinha em y
-
     li $v1, 0                       # Detecta se o jogo já começou
     
     addi $sp, $sp, -24              # Adiciona espaco na pilha para os parametros a serem passados para as funcoes de desenho (economizando registradores)
