@@ -10,27 +10,27 @@ Inicializa:
 
     li $v1, 0                       # Detecta se o jogo já começou
     
-    addi $sp, $sp, -12
-    li $t8, 0x00FFFFFF
-    sw   $t8, 0($sp)
-    li $t8, 280
-    sw   $t8, 4($sp)
-    li $t8, 50
-    sw   $t8, 8($sp)
+    addi $sp, $sp, -24              # Adiciona espaco na pilha para os parametros a serem passados para as funcoes de desenho (economizando registradores)
+    
+    ###########Parte da barra##############
+    li $t8, 0x00FFFFFF              # Adiciona a cor branca para t8
+    sw $t8, 0($sp)                  # Adiciona a cor de t8 para a pilha
+    li $t8, 280                     # Adiciona a posicao inicial da barra em y
+    sw $t8, 4($sp)                  # Adiciona a cor de t8 para a pilha
+    li $t8, 50                      # Adiciona a posicao inicial da barra em x
+    sw $t8, 8($sp)                  # Adiciona a cor de t8 para a pilha
 
     jal Barra                       # Desenha a bola
     
-    addi $sp, $sp, -12
-    li $t8, 0x00FFFFFF
-    sw   $t8, 0($sp)
-    li $t8, 70
-    sw   $t8, 4($sp)
-    li $t8, 266
-    sw   $t8, 8($sp)
+    ###############Parte da bolinha#######
+    li $t8, 0x00FFFFFF              # Adiciona a cor branca para t8
+    sw $t8, 12($sp)                 # Adiciona a cor de t8 para a pilha
+    li $t8, 266                     # Adiciona a posicao inicial da bolinha em y
+    sw $t8, 16($sp)                 # Adiciona a cor de t8 para a pilha
+    li $t8, 70                      # Adiciona a posicao inicial da bolinha em x
+    sw $t8, 20($sp)                 # Adiciona a cor de t8 para a pilha
     
-    jal Bola                       # Desenha a barra
-    
-    
+    jal Bola                        # Desenha a barra
     
     j loop9                         # Inicia o jogo
 
@@ -53,7 +53,6 @@ loop3:
     addi $s4, $s4, 32                # Adiciona no inicio do proximo retangulo (em x)
     
     blt  $s4, $t8, DesenhaRetangulo  # Enquanto nao chegar no final da tela continue desenhando retangulos
-    #blt  $s4, $t8, loop3
     j    loop4                       # Se chegou no final va para a proxima fileira
     
     
@@ -65,7 +64,6 @@ loop4:
     bge  $s2, $t4, MudaCorVerde      # Muda a cor dos retangulos para ou verde ou azul
     
     blt  $s2, $t9, DesenhaRetangulo  # Enquanto nao chegar no final das fileiras continue desenhando retangulos
-    #blt  $s2, $t9, loop3             
     jr   $ra                         # Se chegou retorna pra quem chamou
     
 MudaCorVerde:
@@ -75,7 +73,6 @@ MudaCorVerde:
     bge $s2, $t5, MudaCorAzul        # Muda a cor dos retangulos para azul
     
     blt $s2, $t9, DesenhaRetangulo   # Enquanto nao chegar no final das fileiras continue desenhando retangulos
-    #blt $s2, $t9, loop3
     jr  $ra                          # Se chegou va desenhar a barra
     
     
@@ -84,7 +81,6 @@ MudaCorAzul:
     li  $a2, 0x000000FF              # Muda $a2 para azul
     
     blt $s2, $t9, DesenhaRetangulo   # Enquanto nao chegar no final das fileiras continue desenhando retangulos
-    #blt $s2, $t9, loop3
     jr  $ra                         # Se chegou va desenhar a barra
     
 
@@ -133,13 +129,9 @@ DrawPixel:
 ######Desenhando a barra#########
 Barra:
 
-    #li   $a2, 0x00FFFFFF             # Carregando a cor branca para o registrador a2
-    #addi $s1, $t6, 0                 # y1 = y posicao final da barra
-    #addi $s0, $t7, 0                 # x1 = x posicao inicial da barra
-    lw $a2, 0($sp)
-    lw $s1, 4($sp)
-    lw $s0, 8($sp)    
-    addi $sp, $sp, 12
+    lw $a2, 0($sp)                    # Carregando a cor branca para o registrador a2
+    lw $s1, 4($sp)                    # y1 = y posicao final da barra
+    lw $s0, 8($sp)                    # x1 = x posicao inicial da barra
     
     move $t8, $s0
  
@@ -181,14 +173,10 @@ DrawPixel3:
 #####Desenhando a bolinha######
 Bola:
 
-    #li   $a2, 0x00FFFFFF            # Carregando a cor branca para o registrador a2
-    #move   $s1, $k1                 # y1 = y posicao inicial de y para desenhar a "bolinha"
-    #move   $s0, $k0                 # x1 = x posicao inicial de x para desenhar a "bolinha"
-    lw $a2, 0($sp)
-    lw $s0, 4($sp)
-    lw $s1, 8($sp)
+    lw $a2, 12($sp)                  # Carregando a cor branca para o registrador a2
+    lw $s1, 16($sp)                  # y1 = y posicao inicial de y para desenhar a "bolinha"
+    lw $s0, 20($sp)                  # x1 = x posicao inicial de x para desenhar a "bolinha"
     
-    addi $sp, $sp, 12
     move $t8, $s0
  
     addi $t2, $s0, 14                # Posicao final de x
@@ -225,21 +213,27 @@ DrawPixel4:
 
     j loop7                          # Volta para o loop de desenho
     
-#############Define como pra pintar a barra de Preto#########
+#############Define a cor da pilha pra pintar a barra de Preto#########
 PintaPreto:
-    addi $sp, $sp, -12
-    li $k0, 0x00000000
-    sw   $k0, 0($sp)
-    sw   $t6, 4($sp)
-    sw   $t7, 8($sp)
-    
-    jal Barra
-    j DetectaMovimento
 
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 0($sp)                   # Adiciona t8 para a pilha
+    
+    jal Barra                        # Pinta a Barra de preto
+    j DetectaMovimento
+    
+###########Define a cor da pilha pra pintar a bolinha de Preto#########
+PintaPretoBola:
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 12($sp)                   # Adiciona t8 para a pilha
+    
+    jal Bola                        # Pinta a Bolinha de preto
+    j MoverBola
+    
 #############Detecta a entrada###########
 DetectaEntrada:
     
-    #beq $a3, ' ', DetectaInicio      # Enquanto $a3 for igual a 'espaço' mova a bolinha
+    beq $a3, ' ', DetectaInicio      # Enquanto $a3 for igual a 'espaço' mova a bolinha
     beq $a3, 'a', PintaPreto         # Se for 'a' eh para mover a barra
     beq $a3, 'd', PintaPreto         # Se for 'd' tambem move a barra
     j   loop9                        # Se nao for nem 'a', 'd' ou 'espaço' va para o loop
@@ -253,8 +247,11 @@ DetectaMovimento:
     
 ############Move a bolinha#####################
 MoverBola:
-    subi $k1, $k1, 5                 # Move a bolinha em 1 em y
-    
+    lw   $t8, 16($sp)                # Pega o valor de y da bolinha
+    subi $t8, $t8, 7                 # Adiciona 1 na posicao em y da bolinha
+    sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
+    li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
+    sw   $t8, 12($sp)                # Adiciona a cor de t8 na pilha
     
     jal Bola                         # Move pra funcao de pintar a bolinha de novo na tela
     j loop9
@@ -262,30 +259,25 @@ MoverBola:
 #############Move a barra Para a Esquerda#######
 MoverEsquerda:
     
-    subi $t7, $t7, 7                 # Adiciona 1 na posicao em y da barra
+    lw   $t8, 8($sp)                 # Pega o valor de y da barra
+    subi $t8, $t8, 7                 # Adiciona 1 na posicao em y da barra
+    sw   $t8, 8($sp)                 # Adiciona a nova posicao em y da barra na pilha
+    li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
+    sw   $t8, 0($sp)                 # Adiciona a cor de t8 na pilha
     
-    addi $sp, $sp, -12
-    li $k0, 0x00FFFFFF
-    sw   $k0, 0($sp)
-    sw   $t6, 4($sp)
-    sw   $t7, 8($sp)
-    
-    jal Barra
+    jal Barra                        # Move pra funcao de pintar a barra de novo na tela
     j loop9
     
     
 #############Move a barra Para a Direita#######
 MoverDireita:
+    lw   $t8, 8($sp)                 # Pega o valor de y da barra
+    addi $t8, $t8, 7                 # Adiciona 1 na posicao em y da barra
+    sw   $t8, 8($sp)                 # Adiciona a nova posicao em y da barra na pilha
+    li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
+    sw   $t8, 0($sp)                 # Adiciona a cor de t8 na pilha
     
-    addi $t7, $t7, 7                 # Adiciona 1 na posicao em y da barra
-    
-    addi $sp, $sp, -12
-    li $k0, 0x00FFFFFF
-    sw   $k0, 0($sp)
-    sw   $t6, 4($sp)
-    sw   $t7, 8($sp)
-    
-    jal Barra
+    jal Barra                        # Move pra funcao de pintar a barra de novo na tela
     j loop9
 
 
@@ -296,7 +288,7 @@ DetectaInicio:
     
 SetaInicio:
     li $v1, 1                       # Seta a variavel de controle para joga iniciado
-    #j PintaPretoBola                # Va pintar a bolinha
+    j PintaPretoBola                # Va pintar a bolinha
 
 #############Loop do jogo##########
 loop9:
@@ -307,4 +299,4 @@ loop9:
 
     move $a3, $v0                    # Move a mensagem do display (caracter lido) para $a0
     
-    j DetectaEntrada                 # Va pintar a barra de preto
+    j DetectaEntrada                 # Va tratar a entrada
