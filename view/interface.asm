@@ -213,40 +213,22 @@ DrawPixel4:
 
     j loop7                          # Volta para o loop de desenho
     
-#############Define a cor da pilha pra pintar a barra de Preto#########
-PintaPreto:
-
-    li $t8, 0x00000000               # Adiciona a cor preta em t8
-    sw $t8, 0($sp)                   # Adiciona t8 para a pilha
-    
-    jal Barra                        # Pinta a Barra de preto
-    j DetectaMovimento
-    
-###########Define a cor da pilha pra pintar a bolinha de Preto#########
-PintaPretoBola:
-    li $t8, 0x00000000               # Adiciona a cor preta em t8
-    sw $t8, 12($sp)                   # Adiciona t8 para a pilha
-    
-    jal Bola                        # Pinta a Bolinha de preto
-    j MoverBola
-    
 #############Detecta a entrada###########
 DetectaEntrada:
     
     beq $a3, ' ', DetectaInicio      # Enquanto $a3 for igual a 'espaço' mova a bolinha
-    beq $a3, 'a', PintaPreto         # Se for 'a' eh para mover a barra
-    beq $a3, 'd', PintaPreto         # Se for 'd' tambem move a barra
+    beq $a3, 'a', MoverEsquerda      # Se for 'a' eh para mover a barra para a esquerda
+    beq $a3, 'd', MoverDireita       # Se for 'd' tambem move a barra para a direita
     j   loop9                        # Se nao for nem 'a', 'd' ou 'espaço' va para o loop
     
     
-DetectaMovimento:
-
-    beq $a3, 'a', MoverEsquerda      # Move a barra para a esquerda
-    beq $a3, 'd', MoverDireita       # Move a barra para a direita
-    j loop9
-    
 ############Move a bolinha#####################
 MoverBola:
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 12($sp)                  # Adiciona t8 para a pilha
+    
+    jal Bola                         # Pinta a Bolinha de preto
+    
     lw   $t8, 16($sp)                # Pega o valor de y da bolinha
     subi $t8, $t8, 7                 # Adiciona 1 na posicao em y da bolinha
     sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
@@ -259,9 +241,16 @@ MoverBola:
 #############Move a barra Para a Esquerda#######
 MoverEsquerda:
     
-    lw   $t8, 8($sp)                 # Pega o valor de y da barra
-    subi $t8, $t8, 7                 # Adiciona 1 na posicao em y da barra
-    sw   $t8, 8($sp)                 # Adiciona a nova posicao em y da barra na pilha
+    lw   $t7, 8($sp)                 # Pega o valor de y da barra
+    blt  $t7, -55, loop9             # Se chegou no limite da tela pela esquerda nao mova
+    
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 0($sp)                   # Adiciona t8 para a pilha
+    
+    jal Barra                        # Pinta a Barra de preto
+    
+    subi $t7, $t7, 7                 # Adiciona 1 na posicao em y da barra
+    sw   $t7, 8($sp)                 # Adiciona a nova posicao em y da barra na pilha
     li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
     sw   $t8, 0($sp)                 # Adiciona a cor de t8 na pilha
     
@@ -271,9 +260,16 @@ MoverEsquerda:
     
 #############Move a barra Para a Direita#######
 MoverDireita:
-    lw   $t8, 8($sp)                 # Pega o valor de y da barra
-    addi $t8, $t8, 7                 # Adiciona 1 na posicao em y da barra
-    sw   $t8, 8($sp)                 # Adiciona a nova posicao em y da barra na pilha
+    lw   $t7, 8($sp)                 # Pega o valor de y da barra
+    bgt  $t7, 386, loop9             # Se chegou no limite da tela pela direita nao mova
+    
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 0($sp)                   # Adiciona t8 para a pilha
+    
+    jal Barra                        # Pinta a Barra de preto
+    
+    addi $t7, $t7, 7                 # Adiciona 1 na posicao em y da barra
+    sw   $t7, 8($sp)                 # Adiciona a nova posicao em y da barra na pilha
     li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
     sw   $t8, 0($sp)                 # Adiciona a cor de t8 na pilha
     
@@ -288,7 +284,7 @@ DetectaInicio:
     
 SetaInicio:
     li $v1, 1                       # Seta a variavel de controle para joga iniciado
-    j PintaPretoBola                # Va pintar a bolinha
+    j MoverBola                     # Va mover a bolinha
 
 #############Loop do jogo##########
 loop9:
