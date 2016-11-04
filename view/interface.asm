@@ -1,10 +1,10 @@
 .text
 
 Inicializa:
-    jal InicializaRetangulos        # Desenha os Retangulos
+    
     li $v1, 0                       # Detecta se o jogo já começou
     
-    addi $sp, $sp, -24              # Adiciona espaco na pilha para os parametros a serem passados para as funcoes de desenho (economizando registradores)
+    addi $sp, $sp, -28              # Adiciona espaco na pilha para os parametros a serem passados para as funcoes de desenho (economizando registradores)
     
     ###########Parte da barra##############
     li $t8, 0x00FFFFFF              # Adiciona a cor branca para t8
@@ -26,12 +26,17 @@ Inicializa:
     
     jal Bola                        # Desenha a barra
     
+    ##############Parte dos Retangulos######
+    li $t8, 0x00FF0000              # Adiciona a cor dos retangulos para t8
+    sw $t8, 24($sp)                 # Adiciona a cor t8 para a pilha
+    jal InicializaRetangulos        # Desenha os Retangulos
+    
     j loop9                         # Inicia o jogo
 
 ######Desenhando varios retangulos#####
 InicializaRetangulos:
 
-    li   $a2, 0x00FF0000             # Carregando a cor vermelha para o registrador a2
+    lw   $a2, 24($sp)                # Carregando a cor que esta pilha para os retangulos
     li   $s2, 50                     # y0 = y posicao inicial de y
     li   $s3, -95                    # x0 = x posicao inicial de x
     move $s4, $s3                    # posicao inicial do x que sera deslocado
@@ -61,6 +66,7 @@ loop4:
     jr   $ra                         # Se chegou retorna pra quem chamou
     
 MudaCorVerde:
+    beq $a2, 0x00000000, NaoMudaCor  # Caso seja final de jogo o valor de a2 sera preto
     
     li  $a2, 0x0000FF00              # Muda $a2 para verde
     
@@ -75,7 +81,11 @@ MudaCorAzul:
     li  $a2, 0x000000FF              # Muda $a2 para azul
     
     blt $s2, $t9, DesenhaRetangulo   # Enquanto nao chegar no final das fileiras continue desenhando retangulos
-    jr  $ra                         # Se chegou va desenhar a barra
+    jr  $ra                          # Se chegou va desenhar a barra
+    
+NaoMudaCor:
+   blt $s2, $t9, DesenhaRetangulo    # Enquanto nao chegar no final das fileiras continue desenhando retangulos
+   jr  $ra                           # Se chegou va desenhar a barra
     
 
 ######Desenhando um retangulo#####
@@ -210,9 +220,10 @@ DrawPixel4:
 #############Detecta a entrada###########
 DetectaEntrada:
     
-    beq $a3, ' ', DetectaInicio      # Enquanto $a3 for igual a 'espaço' mova a bolinha
-    beq $a3, 'a', MoverEsquerda      # Se for 'a' eh para mover a barra para a esquerda
-    beq $a3, 'd', MoverDireita       # Se for 'd' tambem move a barra para a direita
+    beq $v0, ' ', DetectaInicio      # Enquanto $a3 for igual a 'espaço' mova a bolinha
+    beq $v0, 'a', MoverEsquerda      # Se for 'a' eh para mover a barra para a esquerda
+    beq $v0, 'd', MoverDireita       # Se for 'd' tambem move a barra para a direita
+    beq $v0, 'e', LimpaTela          # Teste para ver se o jogo eh restartado direitinho
     j   loop9                        # Se nao for nem 'a', 'd' ou 'espaço' va para o loop
     
     
@@ -232,6 +243,7 @@ MoverBola:
     jal Bola                         # Move pra funcao de pintar a bolinha de novo na tela
     j loop9
     
+    
 #############Move a barra Para a Esquerda#######
 MoverEsquerda:
     
@@ -250,7 +262,7 @@ MoverEsquerda:
     
     jal Barra                        # Move pra funcao de pintar a barra de novo na tela
     j loop9
-    
+        
     
 #############Move a barra Para a Direita#######
 MoverDireita:
@@ -286,7 +298,27 @@ loop9:
     ######Le da entrada padrao um caracter######
     li $v0, 12                       # Da load no registrador $v0 com o codigo de ler_caracter
     syscall
-
-    move $a3, $v0                    # Move a mensagem do display (caracter lido) para $a0
     
     j DetectaEntrada                 # Va tratar a entrada
+    
+    
+LimpaTela:  
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 0($sp)                   # Adiciona t8 para a pilha
+    jal Barra                        # Pinta a Barra de preto
+    
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 12($sp)                  # Adiciona t8 para a pilha
+    jal Bola                         # Pinta a Bolinha de preto
+    
+    li $t8, 0x00000000               # Adiciona a cor dos retangulos para t8
+    sw $t8, 24($sp)                  # Adiciona a cor t8 para a pilha
+    jal InicializaRetangulos         # Desenha os Retangulos
+    
+    j Inicializa                     # Restarta o jogo
+    
+end:
+
+    ####Sai do programa########
+    li $v0, 10
+    syscall
