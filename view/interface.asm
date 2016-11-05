@@ -7,7 +7,7 @@ Inicializa:
     addi $sp, $sp, -28              # Adiciona espaco na pilha para os parametros a serem passados para as funcoes de desenho (economizando registradores)
     
     ###########Parte da barra##############
-    li $t8, 0x00000000              # Adiciona a cor branca para t8
+    li $t8, 0x00FFFFFF              # Adiciona a cor branca para t8
     sw $t8, 0($sp)                  # Adiciona a cor de t8 para a pilha
     li $t8, 280                     # Adiciona a posicao inicial da barra em y
     sw $t8, 4($sp)                  # Adiciona a cor de t8 para a pilha
@@ -16,12 +16,8 @@ Inicializa:
 
     jal Barra                       # Desenha a bola
     
-    li $t8, 0x00FFFFFF              # Adiciona a cor branca para t8
-    sw $t8, 0($sp)                  # Adiciona a cor de t8 para a pilha
-    jal Barra
-    
     ###############Parte da bolinha#######
-    li $t8, 0x00000000              # Adiciona a cor branca para t8
+    li $t8, 0x00FFFFFF              # Adiciona a cor branca para t8
     sw $t8, 12($sp)                 # Adiciona a cor de t8 para a pilha
     li $t8, 266                     # Adiciona a posicao inicial da bolinha em y
     sw $t8, 16($sp)                 # Adiciona a cor de t8 para a pilha
@@ -30,15 +26,7 @@ Inicializa:
     
     jal Bola                        # Desenha a barra
     
-    li $t8, 0x00FFFFFF              # Adiciona a cor branca para t8
-    sw $t8, 12($sp)                 # Adiciona a cor de t8 para a pilha
-    jal Bola
-    
     ##############Parte dos Retangulos######
-    li $t8, 0x00000000              # Adiciona a cor dos retangulos para t8
-    sw $t8, 24($sp)                 # Adiciona a cor t8 para a pilha
-    jal InicializaRetangulos        # Desenha os Retangulos
-    
     li $t8, 0x00FF0000              # Adiciona a cor dos retangulos para t8
     sw $t8, 24($sp)                 # Adiciona a cor t8 para a pilha
     jal InicializaRetangulos        # Desenha os Retangulos
@@ -235,7 +223,7 @@ DetectaEntrada:
     beq $v0, ' ', DetectaInicio      # Enquanto $a3 for igual a 'espaço' mova a bolinha
     beq $v0, 'a', MoverEsquerda      # Se for 'a' eh para mover a barra para a esquerda
     beq $v0, 'd', MoverDireita       # Se for 'd' tambem move a barra para a direita
-    beq $v0, 'e', Inicializa         # Teste para ver se o jogo eh restartado direitinho
+    beq $v0, 'e', LimpaTela          # Teste para ver se o jogo eh restartado direitinho
     j   loop9                        # Se nao for nem 'a', 'd' ou 'espaço' va para o loop
     
     
@@ -313,6 +301,23 @@ loop9:
     
     j DetectaEntrada                 # Va tratar a entrada
     
+    
+LimpaTela:  
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 0($sp)                   # Adiciona t8 para a pilha
+    jal Barra                        # Pinta a Barra de preto
+    
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 12($sp)                  # Adiciona t8 para a pilha
+    jal Bola                         # Pinta a Bolinha de preto
+    
+    li $t8, 0x00000000               # Adiciona a cor dos retangulos para t8
+    sw $t8, 24($sp)                  # Adiciona a cor t8 para a pilha
+    jal InicializaRetangulos         # Desenha os Retangulos
+    
+    addi $sp, $sp, 28                # Desaloca espaço na pilha
+    
+    j Inicializa                     # Restarta o jogo
     
 end:
 
