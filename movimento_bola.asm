@@ -71,6 +71,9 @@ DrawPixel4:
     
 ############Move a bolinha#####################
 MoverBola:
+    addi $a0,$a0,3		     # As próximas 3 linhas fazem um sleep(3) para a bola se movimentar
+    li $v0,32	
+    syscall 
     li $t8, 0x00000000               # Adiciona a cor preta em t8
     sw $t8, 12($sp)                  # Adiciona t8 para a pilha
     
@@ -79,17 +82,58 @@ MoverBola:
     lw   $t8, 16($sp)                # Pega o valor de y da bolinha
     lw   $t7, 20($sp)                # Pega o valor de x da bolinha
     
-    # Coloque aqui o movimento da bolinha
-    
+    addi $t8,$t8,-5		     # soma a posição em y	
+    addi $t7,$t7,-5		     # soma a posição em x
+    blt $t8,37,MoverBolaDown 
+          
     sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
     sw   $t7, 20($sp)                # Adiciona a nova posicao em x da bolinha na pilha
     li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
     sw   $t8, 12($sp)                # Adiciona a cor de t8 na pilha
     
     jal Bola                         # Move pra funcao de pintar a bolinha de novo na tela
-    j loop9
     
+    j MoverBola
     
+########Movimento de Subida###########
+MoverBolaDown:
+    addi $a0,$a0,3		    # As próximas 3 linhas fazem um sleep(3) para a bola se movimentar	
+    li $v0,32	
+    syscall 
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 12($sp)                  # Adiciona t8 para a pilha
+    
+    jal Bola                         # Pinta a Bolinha de preto
+    
+    lw   $t8, 16($sp)                # Pega o valor de y da bolinha
+    lw   $t7, 20($sp)                # Pega o valor de x da bolinha
+    
+    addi $t8,$t8,5		     # add em y	
+    addi $t7,$t7,-5		     # add em x	
+    bgt $t8,275,stope		     # para 
+         
+    sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
+    sw   $t7, 20($sp)                # Adiciona a nova posicao em x da bolinha na pilha
+    li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
+    sw   $t8, 12($sp)                # Adiciona a cor de t8 na pilha
+    
+    jal Bola                         # Move pra funcao de pintar a bolinha de novo na tela
+    
+    j MoverBolaDown
+            
+stope:
+    sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
+    sw   $t7, 20($sp)                # Adiciona a nova posicao em x da bolinha na pilha
+    li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
+    sw   $t8, 12($sp)                # Adiciona a cor de t8 na pilha
+    
+    jal Bola                         # Move pra funcao de pintar a bolinha de novo na tela
+    
+    addi $a0,$a0,10
+    li $v0,32
+    syscall
+
+
 #############Detecta a entrada###########
 DetectaEntrada:
     
