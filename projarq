@@ -1,0 +1,107 @@
+  VerificaJogo:
+  #verifica se há jogo
+  j verificaBloco
+  #se houver, vejo se há colisao
+ VerificacaoFeita:
+    jal verificaColisao
+    jal Entrada
+  
+ verificaEntrada:
+  bgtz	$t5, naoDesenhNada  #se não digitar nada
+			
+#s0: endereço inicial da matriz e s7: endereço inicial da bola
+  slt	$t4, $s0, $s7
+  bne 	$0, $t4, colisaoBolinhaBarra #condição para que haja colisão bolinha-barra
+				
+  colisaoBolinhaBarra:
+  add	$t7, $0, $s0		
+  lw	$t4, 0($t7)
+  beq	$0, $t4, bolinhaDesce    #se o valor armazenado em t4 é 0, a bolinha está descendo
+  bne	$0, $t4, bolinhaSobe 	#após a bolinha bater na barra, ela sobe
+				
+  bolinhaSobe:
+  # pinta pixel com fundo
+  sw	$0, 0($s7)
+  addi	$s7, $s7, -512
+   # coloca cor no pixel
+  sw	$t9, 0($s7)
+  addi	$t5, $t5, 25000
+ 				
+ j naoDesenhaNada
+			
+bolinhaDesce:
+ 	# pinta pixel com fundo
+  sw	$0, 0($s7)
+  addi	$s7, $s7, 512
+ 	# coloca cor no pixel
+  sw	$t9, 0($s7)
+  addi	$t5, $t5, 25000
+ 	
+  naoDesenhaBolinha: 				
+   addi	$t5, $t5, -1	
+
+  lw	$t6, 0($s6)
+ #verifica se digitou
+  beq	$t6, 1, moveBarra #caso positivo, movo a barra
+  j	verificaEntrada
+  
+  iniciaEspera:
+  lw $t5, 0x6000($0)
+  
+  
+ #------------------------------------------------------------------------------------#
+  Entrada:
+  beq $t5, $0, TerminaEspera #se $t5 = 0, vou para TerminaEspera
+  addi $a0, $0, 1
+  addi $t5,$t5, -1         #caso contrário, t5 = t5 - 1
+  # carrega o endereço que o código keyboard está carregado
+  lw $t0, 0x6000($0)
+  #estipula para 10s o tempo de espera 
+  addi $t0, $0, 10
+  
+  # verifica qual tecla foi pressionada. Explicação: http://eecs.mines.edu/Courses/csci410/files/L8-Assembly.pdf
+  #usamos a tecla "->" para mover a barra para a direita e "<-" para mover para a esquerda
+  addi $t1, $0, 0x0074 #carrega em t1 o emdereço do tecla ->
+  addi $t2, $0, 0x006b #carrega em t2 o emdereço do tecla <-
+  addi $t4, $0, 0x0029
+  beq $t0, $t1, Dir   #se a tecla pressionada for direita, vou para a Dir
+  beq $t0, $t2, Esq   #se a tecla pressionada for esquerda, vou para a Esq
+  j prossegue
+
+#------------------------------------------------------------------------------------#
+#t6: o regitrador guarda informações sobre o último movimento
+ #Descaloca para a direita
+Dir:
+  bgtz	$t3, ajustaRegDir		# se o último movimento for para a esquerda, preciso ajustar o registrador
+  j	DeslocaDir
+			
+ajustaRegDir:
+  addi 	$s0, $s0, 50
+  add	$t3, $0, $0		
+			
+DeslocaDir:
+  sw	$0, -50($s0)
+  addi	$s0, $s0, -50
+  addi	$t6, $0, 1		# registro de orientação do ultimo movimento
+			
+Barra: #desenho a barra
+#------------------------------------------------------------------------------------#
+#desloca para a esquerda
+Esq:
+# verifica se ultimo movimento foi para direita
+  bgtz	$t6, ajustaRegEsq	 #caso seja, faço um ajuste no registrador
+  j	DeslocaEsq
+  
+ajustaRegEsq:
+  addi 	$s0, $s0, -50
+  add	$t6, $0, $0		
+
+DeslocaEsq:
+  sw	$0, 50($s0)
+  addi	$s0, $s0, 50
+  addi	$t3, $0, 1			# registra a orientação do último movimento no reg $t3
+			
+ Barra: #desenho a barra
+ 
+  		
+
