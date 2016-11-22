@@ -19,7 +19,7 @@ Inicializa:
     ###############Parte da bolinha#######
     li $t8, 0x00FFFFFF              # Adiciona a cor branca para t8
     sw $t8, 12($sp)                 # Adiciona a cor de t8 para a pilha
-    li $t8, 266                     # Adiciona a posicao inicial da bolinha em y
+    li $t8, 265                     # Adiciona a posicao inicial da bolinha em y
     sw $t8, 16($sp)                 # Adiciona a cor de t8 para a pilha
     li $t8, 70                      # Adiciona a posicao inicial da bolinha em x
     sw $t8, 20($sp)                 # Adiciona a cor de t8 para a pilha
@@ -226,23 +226,170 @@ DetectaEntrada:
     beq $v0, 'e', LimpaTela          # Teste para ver se o jogo eh restartado direitinho
     j   loop9                        # Se nao for nem 'a', 'd' ou 'espaço' va para o loop
     
-    
 ############Move a bolinha#####################
 MoverBola:
+    li $v0,32                        # Chama a funcao sleep
+    li $a0, 30                       # Define o tempo para o programa "dormir"
+    syscall                          # Manda o programa "dormir"
     li $t8, 0x00000000               # Adiciona a cor preta em t8
     sw $t8, 12($sp)                  # Adiciona t8 para a pilha
     
     jal Bola                         # Pinta a Bolinha de preto
     
     lw   $t8, 16($sp)                # Pega o valor de y da bolinha
-    subi $t8, $t8, 7                 # Adiciona 1 na posicao em y da bolinha
+    lw   $t7, 20($sp)                # Pega o valor de x da bolinha
+    
+    addi $t8,$t8,-5		     # soma a posição em y	
+    addi $t7,$t7,-5		     # soma a posição em x
+    blt $t8,37,MoverBolaDown         # Se a bola chegar em y na posicao 37 muda o movimento
+    blt $t7,-60,MoverBolaUp          # Se a bola chegar em x na posicao -60 muda o movimento
+          
     sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
+    sw   $t7, 20($sp)                # Adiciona a nova posicao em x da bolinha na pilha
     li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
     sw   $t8, 12($sp)                # Adiciona a cor de t8 na pilha
     
     jal Bola                         # Move pra funcao de pintar a bolinha de novo na tela
-    j loop9
     
+    j MoverBola
+
+############Move a bolinha Up #####################
+MoverBolaUp:
+    li $v0,32                        # Chama a funcao sleep
+    li $a0, 30                       # Define o tempo para o programa "dormir"
+    syscall                          # Manda o programa "dormir"
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 12($sp)                  # Adiciona t8 para a pilha
+    
+    jal Bola                         # Pinta a Bolinha de preto
+    
+    lw   $t8, 16($sp)                # Pega o valor de y da bolinha
+    lw   $t7, 20($sp)                # Pega o valor de x da bolinha
+    
+   addi $t8,$t8,-5		     # soma a posição em y	
+   addi $t7,$t7,5		     # soma a posição em x
+   blt $t8,37,MoverBolaDown	     # Verifica se a bolinha atingiu o chao
+   bgt $t7,429,MoverUp2		     # Verifica se a bolinha atingiu o limite da tela a direita
+
+              
+             
+    sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
+    sw   $t7, 20($sp)                # Adiciona a nova posicao em x da bolinha na pilha
+    li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
+    sw   $t8, 12($sp)                # Adiciona a cor de t8 na pilha
+    
+    jal Bola                         # Move pra funcao de pintar a bolinha de novo na tela
+    
+    j MoverBolaUp
+   
+            
+########Movimento de Descida###########
+MoverBolaDown:
+    li $v0,32                        # Chama a funcao sleep
+    li $a0, 30                       # Define o tempo para o programa "dormir"
+    syscall                          # Manda o programa "dormir"
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 12($sp)                  # Adiciona t8 para a pilha
+    
+    jal Bola                         # Pinta a Bolinha de preto
+    
+    lw   $t8, 16($sp)                # Pega o valor de y da bolinha
+    lw   $t7, 20($sp)                # Pega o valor de x da bolinha
+    lw   $a3, 4($sp)		     #Carregando o valor inicial da barra	
+    
+    addi $t8,$t8,5		     # add em y	
+    addi $t7,$t7,5		     # add em x	
+   
+    bgt $t8,265,verifica	     # Verifica lim do teto
+    bgt $t7,429,MoverDown2 	     # Verifica se a bolinha atingiu o limite da tela a direita	
+	         
+         
+    sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
+    sw   $t7, 20($sp)                # Adiciona a nova posicao em x da bolinha na pilha
+    li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
+    sw   $t8, 12($sp)                # Adiciona a cor de t8 na pilha
+    
+    jal Bola                         # Move pra funcao de pintar a bolinha de novo na tela
+    
+    j MoverBolaDown
+
+MoverDown2:
+    li $v0,32                        # Chama a funcao sleep
+    li $a0, 30                       # Define o tempo para o programa "dormir"
+    syscall                          # Manda o programa "dormir"
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 12($sp)                  # Adiciona t8 para a pilha
+    
+    jal Bola                         # Pinta a Bolinha de preto
+    
+    lw   $t8, 16($sp)                # Pega o valor de y da bolinha
+    lw   $t7, 20($sp)                # Pega o valor de x da bolinha
+    lw   $a3, 4($sp)
+    
+    addi $t8,$t8,5		     # add em y	
+    addi $t7,$t7,-5		     # add em x	
+    bgt $t8,265,verifica2	     # para
+    blt $t7,-70,MoverBolaDown
+     
+              
+    sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
+    sw   $t7, 20($sp)                # Adiciona a nova posicao em x da bolinha na pilha
+    li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
+    sw   $t8, 12($sp)                # Adiciona a cor de t8 na pilha
+    
+    jal Bola                         # Move pra funcao de pintar a bolinha de novo na tela
+    
+    j MoverDown2    
+    
+
+MoverUp2:
+    li $v0,32                        # Chama a funcao sleep
+    li $a0, 30                       # Define o tempo para o programa "dormir"
+    syscall                          # Manda o programa "dormir"
+    li $t8, 0x00000000               # Adiciona a cor preta em t8
+    sw $t8, 12($sp)                  # Adiciona t8 para a pilha
+    
+    jal Bola                         # Pinta a Bolinha de preto
+    
+    lw   $t8, 16($sp)                # Pega o valor de y da bolinha
+    lw   $t7, 20($sp)                # Pega o valor de x da bolinha
+    
+   addi $t8,$t8,-5		     # soma a posição em y	
+   addi $t7,$t7,-5		     # soma a posição em x
+   blt $t8,37,MoverDown2
+   bgt $t7,429,MoverUp2
+   blt $t7,-70,MoverBolaUp 
+             
+    sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
+    sw   $t7, 20($sp)                # Adiciona a nova posicao em x da bolinha na pilha
+    li   $t8, 0x00FFFFFF             # Adiciona a cor branca para t8
+    sw   $t8, 12($sp)                # Adiciona a cor de t8 na pilha
+    
+    jal Bola                         # Move pra funcao de pintar a bolinha de novo na tela
+    
+    j MoverUp2 
+                  
+           
+                                                                                         
+stope:    
+    li $v0,32                        # Chama a funcao sleep
+    li $a0, 30                       # Define o tempo para o programa "dormir"
+    syscall                          # Manda o programa "dormir"
+    j stope
+    
+verifica:
+	lw $t2, 8($sp)
+	blt $t7, $t2,stope
+	addi $t2,$t2,50
+	blt $t7, $t2,stope
+	j MoverBolaUp
+
+ verifica2:
+	lw $t2, 8($sp)
+	blt $t7, $t2,stope
+	addi $t2,$t2,50
+	blt $t7, $t2,stope
+	j MoverUp2  
     
 #############Move a barra Para a Esquerda#######
 MoverEsquerda:
