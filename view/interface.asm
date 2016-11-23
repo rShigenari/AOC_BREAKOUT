@@ -11,7 +11,7 @@ Inicializa:
     sw $t8, 0($sp)                  # Adiciona a cor de t8 para a pilha
     li $t8, 280                     # Adiciona a posicao inicial da barra em y
     sw $t8, 4($sp)                  # Adiciona a cor de t8 para a pilha
-    li $t8, 50                      # Adiciona a posicao inicial da barra em x
+    li $t8, 95                      # Adiciona a posicao inicial da barra em x
     sw $t8, 8($sp)                  # Adiciona a cor de t8 para a pilha
 
     jal Barra                       # Desenha a bola
@@ -21,7 +21,7 @@ Inicializa:
     sw $t8, 12($sp)                 # Adiciona a cor de t8 para a pilha
     li $t8, 265                     # Adiciona a posicao inicial da bolinha em y
     sw $t8, 16($sp)                 # Adiciona a cor de t8 para a pilha
-    li $t8, 70                      # Adiciona a posicao inicial da bolinha em x
+    li $t8, 95                      # Adiciona a posicao inicial da bolinha em x
     sw $t8, 20($sp)                 # Adiciona a cor de t8 para a pilha
     
     jal Bola                        # Desenha a barra
@@ -139,7 +139,7 @@ Barra:
     
     move $t8, $s0
  
-    addi $t2, $s0, 50                # Limite de x para pintar a barra
+    addi $t2, $s0, 150                # Limite de x para pintar a barra
     addi $t1, $s1, 5                 # limite de y para pintar a barra
     
     j  loop5                         # Comece a desenhar
@@ -266,10 +266,10 @@ MoverBolaUp:
     lw   $t8, 16($sp)                # Pega o valor de y da bolinha
     lw   $t7, 20($sp)                # Pega o valor de x da bolinha
     
-   addi $t8,$t8,-5		     # soma a posição em y	
-   addi $t7,$t7,5		     # soma a posição em x
-   blt $t8,37,MoverBolaDown	     # Verifica se a bolinha atingiu o chao
-   bgt $t7,429,MoverUp2		     # Verifica se a bolinha atingiu o limite da tela a direita
+    addi $t8,$t8,-5		     # soma a posição em y	
+    addi $t7,$t7,5		     # soma a posição em x
+    blt $t8,37,MoverBolaDown	     # Verifica se a bolinha atingiu o chao
+    bgt $t7,429,MoverUp2		     # Verifica se a bolinha atingiu o limite da tela a direita
 
               
              
@@ -354,11 +354,11 @@ MoverUp2:
     lw   $t8, 16($sp)                # Pega o valor de y da bolinha
     lw   $t7, 20($sp)                # Pega o valor de x da bolinha
     
-   addi $t8,$t8,-5		     # soma a posição em y	
-   addi $t7,$t7,-5		     # soma a posição em x
-   blt $t8,37,MoverDown2
-   bgt $t7,429,MoverUp2
-   blt $t7,-70,MoverBolaUp 
+    addi $t8,$t8,-5		     # soma a posição em y	
+    addi $t7,$t7,-5		     # soma a posição em x
+    blt $t8,37,MoverDown2
+    bgt $t7,429,MoverUp2
+    blt $t7,-70,MoverBolaUp 
              
     sw   $t8, 16($sp)                # Adiciona a nova posicao em y da bolinha na pilha
     sw   $t7, 20($sp)                # Adiciona a nova posicao em x da bolinha na pilha
@@ -371,25 +371,29 @@ MoverUp2:
                   
            
                                                                                          
-stope:    
+stope:
+    li $t8, 0x00FFFFFF               # Adiciona a cor branca em t8
+    sw $t8, 12($sp)                  # Adiciona t8 para a pilha  
+    jal Bola
+    
     li $v0,32                        # Chama a funcao sleep
     li $a0, 30                       # Define o tempo para o programa "dormir"
     syscall                          # Manda o programa "dormir"
-    j stope
+    j end
     
 verifica:
 	lw $t2, 8($sp)
-	blt $t7, $t2,stope
-	addi $t2,$t2,50
-	blt $t7, $t2,stope
-	j MoverBolaUp
+	blt $t7, $t2,MoverBolaUp
+	addi $t2,$t2,150
+	blt $t7, $t2,MoverBolaUp
+	j stope
 
  verifica2:
 	lw $t2, 8($sp)
-	blt $t7, $t2,stope
-	addi $t2,$t2,50
-	blt $t7, $t2,stope
-	j MoverUp2  
+	blt $t7, $t2,MoverUp2
+	addi $t2,$t2,150
+	blt $t7, $t2,MoverUp2
+	j stope 
     
 #############Move a barra Para a Esquerda#######
 MoverEsquerda:
